@@ -1,0 +1,6 @@
+Python Geonames API
+
+A minimalist api library for accessing information via REST webservice from
+the open geographical database found at http://www.geonames.org.
+
+
