@@ -1,4 +1,3 @@
-import settings
 import httplib
 import simplejson
 import sys
@@ -83,10 +82,7 @@ class GeoNameException(Exception):
     """
     Error initializing GeoNames accessor.
     """
-    def __init__(self, value):
-        self.message = value
-    def __str__(self):
-        return repr(self.message)
+    pass
         
 class GeoNameResultException(GeoNameException):
     """
