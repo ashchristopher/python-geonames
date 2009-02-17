@@ -8,7 +8,12 @@ from xml.etree import ElementTree
 # Default GeoNames server to connect to.
 DEFAULT_GEONAMES_SERVER = 'ws.geonames.org'
 
+
 class GeoNames():
+    API_CALLS = {
+        'geoname' : ['search'],
+    }
+    
     """
     Accessor class for the online GeoNames geographical database. 
     """
@@ -43,39 +48,41 @@ class GeoNames():
         """
         Perform a search for a country's information.
         """
+        api_call = 'search'
         # we only want exact matches, and we only want one possible match.
-        xml = self._api_call('GET', 'search', name_equals=name, country=country, maxRows=1)
+        xml = self._api_call('GET', api_call, name_equals=name, country=country, maxRows=1)
         root_element = ElementTree.XML(xml)
-        results = root_element.find('totalResultsCount').text
-        if not results:
+        is_results = root_element.find('totalResultsCount').text
+        if not is_results:
             raise GeoNameResultException("No results returned for query.")
-        return GeoResult(
-            name = root_element.find('geoname/name').text,
-            country_name = root_element.find('geoname/countryName').text,
-            country_code = root_element.find('geoname/countryCode').text,
-            latitude = root_element.find('geoname/lat').text,
-            longitude = root_element.find('geoname/lng').text,   
-        )
+        return self._build_results(root_element.findall(self._get_root_element(api_call)))
+        
+    def _build_results(self, elements):
+        results = []
+        if not len(elements):
+            return results
+        for element in elements:
+            result = GeoNameResult()
+            for fields in element.getchildren():
+                result.__setattr__(fields.tag, fields.text)
+            results.append(result)
+        return results
+    
+    def _get_root_element(self, api_call):
+        """
+        Figure out the root element for a particular api call.
+        """
+        for root, apis in self.API_CALLS.items():
+            if api_call in apis:
+                return root
+        return None
             
     
-class GeoResult(object):
+class GeoNameResult(object):
     """
-    Result object stores data returned from GeoNames api accessor object.
+    Simple object used to hold results from the api call.
     """
-    def __init__(self, name=None, country_name=None, country_code=None, latitude=None, longitude=None):
-        self.name = name
-        self.country_name = country_name
-        self.country_code = country_code
-        self.latitude = latitude
-        self.longitude = longitude
-        
-    def is_complete(self):
-        complete = True
-        for key, val in self.__dict__.items():
-            if not val:
-                complete = False
-                break
-        return complete
+    pass
                 
                 
 class GeoNameException(Exception):
