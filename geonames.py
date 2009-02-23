@@ -19,7 +19,7 @@ class GeoNames():
         Create a GeoNames object.
         """
         self.server = server
-        self.response_handler = DEFAULT_RESPONSE_HANDLER()
+        self.response_handler = default_handler()
     
     def _api_call(self, method, resource, **kwargs):
         """
