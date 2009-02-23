@@ -40,12 +40,13 @@ class GeoNames():
         c = httplib.HTTPConnection(self.server)
         return c
         
+    # TODO: move this to a helper object.
     def search(self, name, country):
         """
         Perform a search for a country's information.
         """
         # we only want exact matches, and we only want one possible match.
-        return self._api_call('GET', 'search', name_equals=name, country=country, maxRows=1)
+        return self._api_call('GET', 'search', name_equals=name, country=country, maxRows=1)er
                         
                 
 class GeoNameException(Exception):
